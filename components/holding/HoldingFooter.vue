@@ -28,22 +28,25 @@
       </div>
     </div>
 
-    <p v-if="description" data-holding-footer-description>{{ description }}</p>
+    <div
+      v-if="description?.length"
+      data-holding-footer-description
+      class="underline-links"
+    >
+      <SanityBlocks :blocks="description" />
+    </div>
+
+    <div
+      v-if="legal?.length"
+      data-holding-footer-legal
+      class="underline-links"
+    >
+      <SanityBlocks :blocks="legal" />
+    </div>
 
     <div data-holding-footer-social>
       <span data-holding-follow-label>Follow</span>
-      <ul data-holding-social-links>
-        <li v-for="link in socialLinks" :key="link._key || link.url">
-          <a
-            :href="link.url"
-            target="_blank"
-            rel="noopener noreferrer"
-            data-holding-social-link
-          >
-            {{ link.title }}
-          </a>
-        </li>
-      </ul>
+      <HoldingSocialLinks :social-links="socialLinks" />
     </div>
   </footer>
 </template>
@@ -57,8 +60,12 @@ defineProps({
     default: '',
   },
   description: {
-    type: String,
-    default: '',
+    type: Array,
+    default: () => [],
+  },
+  legal: {
+    type: Array,
+    default: () => [],
   },
   contactItems: {
     type: Array,

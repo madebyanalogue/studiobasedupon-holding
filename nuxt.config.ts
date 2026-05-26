@@ -60,7 +60,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'Based Upon',
+      title: 'Studio Based Upon',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },

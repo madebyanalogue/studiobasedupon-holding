@@ -9,151 +9,50 @@
 
     <div class="header-bar header--styling">
       <div class="header-logo">
-        <NuxtLink to="/">
+        <NuxtLink to="/" :aria-label="title">
           <Logo />
         </NuxtLink>
       </div>
 
-      <nav class="header-nav" aria-label="Main">
-        <NuxtLink
-          v-for="item in headerMenuItems"
-          :key="item._key || item.text"
-          :to="getMenuItemUrl(item)"
-          :target="isExternalUrl(item.link?.url) ? '_blank' : undefined"
-          :rel="isExternalUrl(item.link?.url) ? 'noopener' : undefined"
-          :class="['header-link', { 'header-link-active': isActive(item) }]"
-        >
-          <span class="header-link-text">{{ item.text }}</span>
-        </NuxtLink>
-      </nav>
-    </div>
+      <div v-if="copyright" class="header-copyright">
+        {{ copyright }}
+      </div>
 
-    <div
-      v-if="showContactButton && contactMounted"
-      ref="contactRoot"
-      class="header-contact show-md"
-    >
-      <NuxtLink
-        v-if="contactButtonUrl"
-        :to="contactButtonUrl"
-        class="header-contact-toggle header-contact-link-button header--styling"
-      >
-        <div>{{ navigationContact.buttonTitle }}</div>
-      </NuxtLink>
-      <template v-else>
-        <button
-          type="button"
-          class="header-contact-toggle header--styling"
-          :class="{ 'header-contact-toggle-open': contactOpen }"
-          :aria-expanded="contactOpen"
-          aria-haspopup="true"
-          @click="toggleContact"
-        >
-          <div>{{ navigationContact.buttonTitle }}</div>
-        </button>
-        <div
-          v-show="contactOpen"
-          class="header-contact-panel white-text rounded-medium"
-          role="region"
-          :aria-label="navigationContact.buttonTitle"
-        >
-          <div
-            v-for="row in navigationContact.contacts"
-            :key="row._key"
-            class="header-contact-item pad-20"
-          >
-            <div class="header-contact-item-title subtitle subtitle--circle white-dot">
-              {{ row.title }}
-            </div>
-            <a
-              v-if="contactLinkUsesNative(getContactLinkUrl(row))"
-              :href="getContactLinkUrl(row)"
-              :target="isExternalHttp(getContactLinkUrl(row)) ? '_blank' : undefined"
-              :rel="isExternalHttp(getContactLinkUrl(row)) ? 'noopener' : undefined"
-              class="header-contact-link"
-            >{{ row.linkText }}</a>
-            <NuxtLink
-              v-else
-              :to="getContactLinkUrl(row)"
-              class="header-contact-link"
-            >
-              {{ row.linkText }}
-            </NuxtLink>
-          </div>
-        </div>
-      </template>
-    </div>
-
-
-    <div
-      ref="mobileMenuRoot"
-      class="header-mobile header--styling"
-    >
-      <button
-        type="button"
-        class="header-menu-toggle"
-        :class="{ 'header-menu-toggle-open': mobileMenuOpen }"
-        :aria-expanded="mobileMenuOpen"
-        aria-controls="header-mobile-nav"
-        @click="toggleMobileMenu"
-      >
-        Menu
-      </button>
       <div
-        v-show="mobileMenuOpen"
-        id="header-mobile-nav"
-        class="header-mobile-panel header-mobile-panel--fullscreen underline-links"
-        role="navigation"
-        aria-label="Main"
-      >
-        <div class="header-mobile-panel-main">
-          <NuxtLink
-            v-for="item in mobileMenuItems"
-            :key="item._key || item.text"
-            :to="getMenuItemUrl(item)"
-            :target="isExternalUrl(item.link?.url) ? '_blank' : undefined"
-            :rel="isExternalUrl(item.link?.url) ? 'noopener' : undefined"
-            :class="['header-mobile-link', 'header-link', { 'header-link-active': isActive(item) }]"
-            @click="mobileMenuOpen = false"
-          >
-            <span class="header-link-text">{{ item.text }}</span>
-          </NuxtLink>
-        </div>
-        <div
           v-if="showMobileMenuSocialLinks"
           class="header-mobile-social"
         >
-          <p
-            v-if="mobileMenuSocialLinksTitle.trim()"
-            class="header-mobile-social-title"
+        <p
+          v-if="mobileMenuSocialLinksTitle.trim()"
+          class="header-mobile-social-title"
+        >
+          {{ mobileMenuSocialLinksTitle }}
+        </p>
+        <div class="header-mobile-social-links">
+          <template
+            v-for="row in mobileMenuSocialLinks"
+            :key="row._key"
           >
-            {{ mobileMenuSocialLinksTitle }}
-          </p>
-          <div class="header-mobile-social-links">
-            <template
-              v-for="row in mobileMenuSocialLinks"
-              :key="row._key"
+            <a
+              v-if="contactLinkUsesNative(row.url)"
+              :href="row.url"
+              :target="isExternalHttp(row.url) ? '_blank' : undefined"
+              :rel="isExternalHttp(row.url) ? 'noopener' : undefined"
+              class="header-mobile-social-link"
+              @click="mobileMenuOpen = false"
+            >{{ row.title }}</a>
+            <NuxtLink
+              v-else
+              :to="row.url"
+              class="header-mobile-social-link"
+              @click="mobileMenuOpen = false"
             >
-              <a
-                v-if="contactLinkUsesNative(row.url)"
-                :href="row.url"
-                :target="isExternalHttp(row.url) ? '_blank' : undefined"
-                :rel="isExternalHttp(row.url) ? 'noopener' : undefined"
-                class="header-mobile-social-link"
-                @click="mobileMenuOpen = false"
-              >{{ row.title }}</a>
-              <NuxtLink
-                v-else
-                :to="row.url"
-                class="header-mobile-social-link"
-                @click="mobileMenuOpen = false"
-              >
-                {{ row.title }}
-              </NuxtLink>
-            </template>
-          </div>
+              {{ row.title }}
+            </NuxtLink>
+          </template>
         </div>
       </div>
+
     </div>
   </header>
 </template>
@@ -166,6 +65,8 @@ const {
   headerMenu,
   mobileMenu,
   headerType,
+  title,
+  copyright,
   navigationContact,
   showMobileMenuSocialLinks,
   mobileMenuSocialLinksTitle,
@@ -357,39 +258,17 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.header {
-  gap: 10px;
-  display: flex;
-  align-items: center;
-  position: relative;
-  z-index: 1000;
-  font-size: 16px;
-  /* transition: color 0.6s ease, background-color 0.6s ease; */
-  transform: translateY(0);
-}
 
-.header--styling {
-  border-radius: 10px;
-  background-color: var(--white);
-  height: var(--header-height);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-}
-
-
-@media (min-width: 800px) {
-  .header--styling {
-    padding: 12px 20px;
-    
-  }
-}
 
 .header-logo {
   display: flex;
   flex: 1;
   color: var(--orange);
+}
+
+.header-copyright {
+  margin-left: auto;
+  white-space: nowrap;
 }
 .header-bar {
   flex: 1;

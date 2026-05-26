@@ -1,8 +1,8 @@
-# Based Upon — Nuxt Frontend
+# Studio Based Upon — Nuxt Frontend
 
-This repository contains **only** the Nuxt frontend for the Based Upon project.
+This repository contains **only** the Nuxt frontend for the Studio Based Upon project.
 
-- **GitHub**: https://github.com/madebyanalogue/basedupon-holding.git
+- **GitHub**: https://github.com/madebyanalogue/studiobasedupon-holding.git
 - **Sanity project ID**: `b6xol4su`
 
 The Sanity Studio (`basedupon-studio`) is kept separately and is **not** part of this repository.

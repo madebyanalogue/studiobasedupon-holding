@@ -1,34 +1,25 @@
 <template>
   <div data-holding-page :data-holding-active-panel="activePanel">
-    <HoldingHeader
-      :site-title="siteTitle"
-      :year="year"
-      :social-links="socialLinks"
-    />
-
-    <button
-      type="button"
-      data-holding-updates-trigger
-      @click="openUpdates"
-    >
-      Updates
-    </button>
-
     <div data-holding-panels>
       <section
         ref="homePanelRef"
         data-holding-panel="home"
+        class="home-scroll-section"
         :aria-hidden="activePanel !== 'home'"
       >
         <HoldingHomeScroll
           :items="homeScrollItems"
           :logo="holding?.homeScrollLogo"
+          :logo-text="holding?.homeScrollLogoText"
         />
+
+        <HoldingPanelTrigger label="Updates" trigger="updates" @click="openUpdates" />
       </section>
 
       <section
         ref="updatesPanelRef"
         data-holding-panel="updates"
+        class="home-updates-section"
         :aria-hidden="activePanel !== 'updates'"
       >
         <HoldingUpdates
@@ -40,15 +31,19 @@
         <HoldingFooter
           :site-title="siteTitle"
           :description="holding?.footerDescription"
+          :legal="holding?.footerLegal"
           :contact-items="holding?.footerContact || []"
           :social-links="socialLinks"
         />
+
+        <HoldingPanelTrigger label="Home" trigger="home" @click="openHome" />
       </section>
     </div>
   </div>
 </template>
 
 <script setup>
+import gsap from 'gsap'
 import { injectPageLoading } from '~/composables/usePageLoading'
 
 const { setLoading } = injectPageLoading()
@@ -57,6 +52,37 @@ const activePanel = ref('home')
 const homePanelRef = ref(null)
 const updatesPanelRef = ref(null)
 
+const PANEL_TRANSITION = {
+  duration: 0.6,
+  ease: 'power2.inOut',
+}
+
+function animatePanels(y) {
+  const panels = [homePanelRef.value, updatesPanelRef.value].filter(Boolean)
+  if (!panels.length) return
+
+  gsap.to(panels, {
+    y,
+    ...PANEL_TRANSITION,
+  })
+}
+
+function openUpdates() {
+  if (!process.client || activePanel.value === 'updates') return
+
+  activePanel.value = 'updates'
+  document.body.classList.add('holding-updates-open')
+  animatePanels('-100%')
+}
+
+function openHome() {
+  if (!process.client || activePanel.value === 'home') return
+
+  activePanel.value = 'home'
+  document.body.classList.remove('holding-updates-open')
+  animatePanels('0%')
+}
+
 const year = new Date().getFullYear()
 
 const HOLDING_QUERY = `{
@@ -64,6 +90,7 @@ const HOLDING_QUERY = `{
     updatesTitle,
     newsletterThankYouMessage,
     footerDescription,
+    footerLegal,
     footerContact[] {
       _key,
       title,
@@ -81,7 +108,21 @@ const HOLDING_QUERY = `{
     socialLinks[] {
       _key,
       title,
-      url
+      url,
+      image {
+        alt,
+        asset-> {
+          _id,
+          url,
+          metadata {
+            dimensions {
+              width,
+              height,
+              aspectRatio
+            }
+          }
+        }
+      }
     },
     homeScrollLogo {
       alt,
@@ -97,6 +138,7 @@ const HOLDING_QUERY = `{
         }
       }
     },
+    homeScrollLogoText,
     homeScrollItems[] {
       _key,
       title,
@@ -155,9 +197,23 @@ watch(pending, (isPending) => {
 const holding = computed(() => data.value?.holding || null)
 const settings = computed(() => data.value?.settings || null)
 
-const siteTitle = computed(() => settings.value?.title || settings.value?.seoTitle || 'Based Upon')
+const siteTitle = computed(() => settings.value?.title || settings.value?.seoTitle || 'Studio Based Upon')
 const socialLinks = computed(() => holding.value?.socialLinks || [])
 const homeScrollItems = computed(() => holding.value?.homeScrollItems || [])
+
+const holdingHeader = useState('holding-header')
+
+watch(
+  [siteTitle, socialLinks],
+  () => {
+    holdingHeader.value = {
+      siteTitle: siteTitle.value,
+      year: year,
+      socialLinks: socialLinks.value,
+    }
+  },
+  { immediate: true },
+)
 
 function blocksToPlainText(blocks) {
   if (!Array.isArray(blocks)) return ''
@@ -196,14 +252,11 @@ const newsItems = computed(() =>
   }),
 )
 
-function openUpdates() {
-  activePanel.value = 'updates'
-}
-
 defineExpose({
   activePanel,
   homePanelRef,
   updatesPanelRef,
   openUpdates,
+  openHome,
 })
 </script>

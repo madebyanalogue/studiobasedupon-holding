@@ -5,14 +5,14 @@
       class="logo-svg"
       v-html="logoSvgHtml"
     />
-    <span v-else>Based Upon</span>
+    <span v-else>{{ title }}</span>
   </div>
 </template>
 
 <script setup>
 import { useSiteSettings } from '~/composables/useSiteSettings'
 
-const { logo } = useSiteSettings()
+const { logo, title } = useSiteSettings()
 
 const SVG_TAG_RE = /<\s*svg[\s>]/i
 

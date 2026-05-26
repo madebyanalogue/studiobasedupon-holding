@@ -2,13 +2,16 @@
   <section class="home-scroll-section">
     <div ref="rootRef" class="home--container">
       <div class="logo home--logo">
-        <NuxtImg
-          v-if="logoUrl"
-          :src="logoUrl"
-          :alt="logoAlt"
-          class="home--logo-image"
-        />
-        <Logo v-else />
+        <div class="home--logo-inner">
+          <NuxtImg
+            v-if="logoUrl"
+            :src="logoUrl"
+            :alt="logoAlt"
+            class="home--logo-image"
+          />
+          <Logo v-else />
+          <p v-if="hasLogoText" class="home--logo-text mono">{{ logoText.trim() }}</p>
+        </div>
       </div>
 
       <div v-if="hasItems" ref="containerRef" class="container">
@@ -27,6 +30,7 @@
         </div>
       </div>
     </div>
+
   </section>
 </template>
 
@@ -43,6 +47,10 @@ const props = defineProps({
     type: Object,
     default: null,
   },
+  logoText: {
+    type: String,
+    default: '',
+  },
 })
 
 const rootRef = ref(null)
@@ -57,6 +65,7 @@ const getImageUrl = (imageSource) => {
 
 const logoUrl = computed(() => getImageUrl(props.logo))
 const logoAlt = computed(() => props.logo?.alt || '')
+const hasLogoText = computed(() => Boolean(props.logoText?.trim()))
 
 const hasItems = computed(() => Array.isArray(props.items) && props.items.length > 0)
 
@@ -445,16 +454,38 @@ body.has-home-scroll main.page-wrapper {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1;
+  pointer-events: none;
+}
+
+.home--logo-inner {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  pointer-events: none;
 }
 
 .home--logo-image {
   max-width: min(40vw, 320px);
   height: auto;
   display: block;
+}
+
+.home--logo-text {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  margin-top: calc(var(--gutter) * 4);
+  text-align: center;
+  white-space: pre-line;
+  width: 100%;
+}
+
+.home-scroll-section {
+  position: relative;
+  z-index: var(--holding-scroll-z, 0);
+  min-height: 100dvh;
 }
 
 .home--container {
@@ -465,6 +496,7 @@ body.has-home-scroll main.page-wrapper {
   top: 0;
   left: 0;
   width: 100%;
+  z-index: var(--holding-scroll-z, 0);
 }
 
 .home--container .container {

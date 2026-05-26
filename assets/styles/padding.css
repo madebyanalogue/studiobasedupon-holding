@@ -25,17 +25,6 @@
   :root {  --unit: calc(var(--unit-desktop)); }
 }
 
-#app {
-    padding: var(--gutter);
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
-    grid-template-areas:
-    "header"
-    "main"
-    "footer";
-    gap: var(--gutter);
-}
 
 /* @media (min-width: 1000px) {
 .page-wrapper {

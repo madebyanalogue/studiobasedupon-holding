@@ -9,10 +9,10 @@
         v-for="(item, index) in newsItems"
         :key="item._id || item._key || index"
         class="news-item flex gap-md-100 yellow pad-25 rounded-medium underline-links"
+        :class="{ 'news-item--text': !item.featuredImage?.asset?.url }"
       >
-        <div class="news-thumbnail">
+        <div v-if="item.featuredImage?.asset?.url" class="news-thumbnail">
           <NuxtImg
-            v-if="item.featuredImage?.asset?.url"
             :src="item.featuredImage.asset.url"
             :width="item.featuredImage.asset.metadata?.dimensions?.width"
             :height="item.featuredImage.asset.metadata?.dimensions?.height"
@@ -54,6 +54,14 @@ const newsItems = computed(() =>
 
 .news-item {
   align-items: center;
+}
+
+.news-item--text {
+  align-items: flex-start;
+}
+
+.news-item--text .news-content {
+  flex: 1;
 }
 
 .news-thumbnail {

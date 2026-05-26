@@ -9,6 +9,12 @@
   
   <div v-if="preloaderReady || disablePreloader || isHoldingPage" id="app" :style="appStyles">
     <Header v-if="!isHoldingPage" />
+    <HoldingHeader
+      v-if="isHoldingPage"
+      :site-title="holdingHeader.siteTitle"
+      :year="holdingHeader.year"
+      :social-links="holdingHeader.socialLinks"
+    />
     <main class="page-wrapper">
       <NuxtPage />
     </main>
@@ -93,6 +99,12 @@ const appStyles = computed(() => {
 const route = useRoute()
 const isHoldingPage = computed(() => route.path === '/')
 
+const holdingHeader = useState('holding-header', () => ({
+  siteTitle: '',
+  year: new Date().getFullYear(),
+  socialLinks: [],
+}))
+
 watch(isHoldingPage, (holding) => {
   if (holding && process.client) {
     preloaderReady.value = true
@@ -170,7 +182,7 @@ watch(headerType, () => {
 
 useHead(() => {
   const meta = []
-  const siteTitle = seoTitle.value || 'Based Upon'
+  const siteTitle = seoTitle.value || 'Studio Based Upon'
   const siteUrl = process.client ? window.location.origin : 'https://basedupon.example.com'
   const currentUrl = process.client ? window.location.href : siteUrl
   

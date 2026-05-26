@@ -1,43 +1,39 @@
 @font-face {
-  font-family: 'Season Sans';
-  src:
-    url('/fonts/SeasonSans-Light.woff2') format('woff2'),
-    url('/fonts/SeasonSans-Light.woff') format('woff');
+  font-family: 'Maison Neue';
+  src: url('/fonts/MaisonNeueBook.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: 'Season Sans';
-  src:
-    url('/fonts/SeasonSans-LightItalic.woff2') format('woff2'),
-    url('/fonts/SeasonSans-LightItalic.woff') format('woff');
-  font-weight: normal;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Season Sans';
-  src:
-    url('/fonts/SeasonSans-Medium.woff2') format('woff2'),
-    url('/fonts/SeasonSans-Medium.woff') format('woff');
+  font-family: 'Maison Neue';
+  src: url('/fonts/MaisonNeueMedium.woff2') format('woff2');
   font-weight: bold;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: 'DM Mono';
-  src: url('/fonts/DMMono-Regular.ttf') format('truetype');
+  font-family: 'Maison Mono';
+  src: url('/fonts/MaisonNeueMonoRegular.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 :root {
-  --font-body: 'Season Sans', sans-serif;
-  --font-mono: 'DM Mono', monospace;
+  --font-body: 'Maison Neue', sans-serif;
+  --font-mono: 'Maison Mono', 'Maison Neue', monospace;
   --tablet: var(--desktop)
 }
+
+body {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+
+
+
 
 .line-height-1 {
   line-height: 1;

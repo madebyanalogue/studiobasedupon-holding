@@ -25,6 +25,7 @@
         v-for="(item, index) in visibleItems"
         :key="item._id"
         data-holding-news-item
+        :data-holding-news-type="item.featuredImage?.asset?.url ? 'image' : 'text'"
         :data-holding-news-index="index"
       >
         <NuxtImg
@@ -35,7 +36,12 @@
           alt=""
           data-holding-news-image
         />
-        <p v-else data-holding-news-text>{{ item.excerpt }}</p>
+        <div v-else data-holding-news-text>
+          <p v-if="item.title" data-holding-news-title>{{ item.title }}</p>
+          <p v-if="item.excerpt && item.excerpt !== item.title" data-holding-news-excerpt>
+            {{ item.excerpt }}
+          </p>
+        </div>
         <time
           v-if="item.timestamp"
           :datetime="item.timestamp"

@@ -116,8 +116,8 @@ export const useSiteSettings = () => {
 
   const maxWidth = computed(() => settings.value?.maxWidth || '1800px')
   const logo = computed(() => settings.value?.logo)
-  const title = computed(() => settings.value?.title || 'Based Upon')
-  const seoTitle = computed(() => settings.value?.seoTitle || 'Based Upon')
+  const title = computed(() => settings.value?.title || 'Studio Based Upon')
+  const seoTitle = computed(() => settings.value?.seoTitle || 'Studio Based Upon')
   const seoDescription = computed(() => settings.value?.seoDescription || '')
   const disablePreloader = computed(() => settings.value?.disablePreloader === true)
   const preloaderImages = computed(() => settings.value?.preloaderImages || [])
@@ -191,9 +191,10 @@ export const useSiteSettings = () => {
   const headerType = computed(() => settings.value?.headerType || 'responsive')
   const mobileBreakpoint = computed(() => settings.value?.mobileBreakpoint ?? 800)
   const copyright = computed(() => {
-    const text = settings.value?.copyright || ''
+    const siteTitle = settings.value?.title || 'Studio Based Upon'
+    const text = settings.value?.copyright?.trim() || `© [year] ${siteTitle}`
     const currentYear = new Date().getFullYear()
-    return text.replace(/\[year\]/g, currentYear.toString())
+    return text.replace(/\[year\]/gi, String(currentYear))
   })
 
   return {

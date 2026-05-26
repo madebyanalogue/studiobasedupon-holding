@@ -1,80 +1,23 @@
-/* Colour tokens — layout uses --text-color / --background-color from app.vue useHead. */
 :root {
-  --orange: #FF5722;
-  --red: #FF3B30;
-  --yellow: #E2FE20;
-  --green: #4CAF50;
-  --blue: #2196F3;
-  --lavender: #DBD2FE;
-  --purple: #B8A5FE;
-  --pink: #FFA1D7;
-  --brown: #795548;
-  --gray: #9E9E9E;
-  --black: #000000;
-  --white: #ffffff;
-  --light-grey: #F3F3F3;
-  --beige: #F0E5DD;
-  --background-color: var(--light-grey);
-  --text-color: var(--black);
-
-
-  --purple-tint-1: color-mix(in srgb, var(--purple) 85%, white 15%);
-  --purple-tint-2: color-mix(in srgb, var(--purple) 70%, white 30%);
-  --purple-tint-3: color-mix(in srgb, var(--purple) 55%, white 45%);
-  --purple-tint-4: color-mix(in srgb, var(--purple) 40%, white 60%);
-
-  --pink-tint-1: color-mix(in srgb, var(--pink) 85%, white 15%);
-  --pink-tint-2: color-mix(in srgb, var(--pink) 70%, white 30%);
-  --pink-tint-3: color-mix(in srgb, var(--pink) 55%, white 45%);
-  --pink-tint-4: color-mix(in srgb, var(--pink) 40%, white 60%);
-
+  --red: 230, 76, 26;
+  --off-white: 241, 237, 228;
+  --black: 0, 0, 0;
+  --white: 255, 255, 255;
+  --background-color: rgb(var(--white));
+  --text-color: rgb(var(--black));
 }
 
 svg > * {
   fill: currentColor;
 }
 
-.orange { background-color: var(--orange); }
-.yellow { background-color: var(--yellow);}
-.green { background-color: var(--green);}
-.blue { background-color: var(--blue);}
-.purple { background-color: var(--purple);}
-.pink { background-color: var(--pink);}
-.brown { background-color: var(--brown);}
-.gray { background-color: var(--gray);}
-.black { background-color: var(--black);}
-.white { background-color: var(--white);}
-.beige { background-color: var(--beige);}
-.lavender { background-color: var(--lavender);}
+.red            { background-color: rgb(var(--red)); }
+.black          { background-color: rgb(var(--black)); }
+.white          { background-color: rgb(var(--white)); }
+.off-white      { background-color: rgb(var(--off-white)); }
 
-.pink-1 { background-color: var(--pink-1); }
-.pink-2 { background-color: var(--pink-2); }
-.pink-3 { background-color: var(--pink-3); }
-.pink-4 { background-color: var(--pink-4); }
 
-.orange-text { color: var(--orange); }
-.yellow-text { color: var(--yellow); }
-.green-text { color: var(--green); }
-.blue-text { color: var(--blue); }
-.purple-text { color: var(--purple); }
-.pink-text { color: var(--pink); }
-.brown-text { color: var(--brown); }
-.gray-text { color: var(--gray); }
-.black-text { color: var(--black); }
-.white-text { color: var(--white); }
-.beige-text { color: var(--beige); }
-.lavender-text { color: var(--lavender); }
-
-.orange-dot { --subtitle-dot-color: var(--orange); }
-.red-dot { --subtitle-dot-color: var(--red); }
-.yellow-dot { --subtitle-dot-color: var(--yellow); }
-.green-dot { --subtitle-dot-color: var(--green); }
-.blue-dot { --subtitle-dot-color: var(--blue); }
-.purple-dot { --subtitle-dot-color: var(--purple); }
-.pink-dot { --subtitle-dot-color: var(--pink); }
-.brown-dot { --subtitle-dot-color: var(--brown); }
-.gray-dot { --subtitle-dot-color: var(--gray); }
-.black-dot { --subtitle-dot-color: var(--black); }
-.white-dot { --subtitle-dot-color: var(--white); }
-.beige-dot { --subtitle-dot-color: var(--beige); }
-.lavender-dot { --subtitle-dot-color: var(--lavender); }
+.red-text       { color: rgb(var(--red)); }
+.black-text     { color: rgb(var(--black)); }
+.white-text     { color: rgb(var(--white)); }
+.off-white-text { color: rgb(var(--off-white)); }
