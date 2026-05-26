@@ -1,0 +1,31 @@
+/* Click-to-zoom lightbox (see plugins/click-zoom.client.js) */
+img[data-click-zoom],
+[data-click-zoom] img,
+[data-click-zoom-article] img {
+  cursor: zoom-in;
+}
+
+[data-click-zoom-lightbox] > img {
+  display: block;
+  max-width: none;
+  max-height: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  border-radius: var(--rounded-medium, 0.75em);
+  transform-origin: center center;
+}
+
+/* Fixed overlay; image is absolutely positioned + GSAP transform (no flex — avoids layout/FLIP mismatch) */
+.click-zoom__lightbox {
+  z-index: 10000;
+  cursor: zoom-out;
+  background-color: #000000e6;
+  box-sizing: border-box;
+  padding: 3em;
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}

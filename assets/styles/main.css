@@ -1,0 +1,262 @@
+
+
+/* Hide body content until preloader is ready */
+body:not(.preloader-ready) {
+  overflow: hidden;
+}
+
+body:not(.preloader-ready) #app {
+  visibility: hidden;
+  opacity: 0;
+}
+
+body.preloader-ready #app {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.2s ease-in;
+}
+
+html {
+  /* Horizontal clip without breaking position:sticky (avoid overflow:hidden on #app) */
+  overflow-x: clip;
+}
+
+:root {
+  --mobile-breakpoint: 800;
+
+  /* Reference viewport width for .fluid-type vw math (match design artboard). Override per element with --fs-cap-vp. */
+  --fluid-type-cap-vp: 1920;
+  /* Fluid uses min(100vw, this); sizing stops increasing past this viewport width. Override per element with --fs-fluid-max-vp. */
+  --fluid-type-max-vp: 2000;
+
+  
+  /* Line height */
+  --line-height: 1.2;
+
+
+  /* Aspect ratios */
+  --aspect-ratio-portrait: 3 / 4;
+  --aspect-ratio-square: 1 / 1;
+  --aspect-ratio-landscape: 4.5 / 3;
+  
+  /* Max width */
+  --max-width: 1800px;
+
+  /* Underline offset */
+  --underline-offset: -15%;
+  --underline-width: 1px;
+  
+  /* Header height (will be set dynamically via inline styles) */
+  --header-height: 49px;
+
+  --rounded-medium: 10px;
+  --rounded-small: 8px;
+  --rounded-button: 10px;
+
+}
+
+@media (min-width: 1000px) {
+  :root {
+    --rounded-medium: 15px;
+    --rounded-small: 13px;
+    --rounded-button: 10px;
+  }
+}
+
+.rounded-medium {
+  border-radius: var(--rounded-medium);
+  overflow: hidden;
+}
+
+.rounded-small {
+  border-radius: var(--rounded-small);
+  overflow: hidden;
+}
+
+header .logo-svg svg {
+  max-height: var(--logo-height);
+  height:200px;
+  width: auto;
+}
+
+.logo-svg svg,
+.logo-svg {
+  width: 100%;
+  display: block;
+}
+
+
+.portfolio-loading {
+  min-height: calc(100vh - var(--header-height));
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Shell colours + type scale (was editable in Sanity; change here). Breakpoint matches default --mobile-breakpoint. */
+html {
+  --text-color: #000000;
+  --background-color: #ffffff;
+  --font-size-body: 12px;
+  --font-size-large: 18px;
+  --font-size-logo: 14px;
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height);
+  color: var(--text-color);
+  background-color: var(--background-color);
+  transition-property: color, background-color;
+  transition-duration: 0.6s;
+  transition-timing-function: ease;
+  transition-delay: 0s;
+}
+
+@media (min-width: 800px) {
+  html {
+    --font-size-logo: 18px;
+  }
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height);
+  color: var(--text-color);
+  background-color: var(--background-color);
+  transition-property: color, background-color;
+  transition-duration: 0.6s;
+  transition-timing-function: ease;
+  transition-delay: 0s;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+#app {
+  min-height: 100vh;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  transition-property: color, background-color;
+  transition-duration: 0.6s;
+  transition-timing-function: ease;
+  transition-delay: 0s;
+}
+
+
+.no-pad-top {
+  padding-top: 0px !important;
+}
+
+.border-bottom {
+  border-bottom: 1px solid currentColor;
+}
+.border-top {
+  border-top: 1px solid currentColor;
+}
+
+
+
+
+.arrow-up {
+  width: 12px;
+  height: 25px;
+  position: relative;
+  display: block;
+}
+.arrow-up:before {
+  content: '';
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 8px;
+    height: auto;
+    display: block;
+    aspect-ratio: 1 / 1;
+    border-top: 1px solid currentColor;
+    border-right: 1px solid currentColor;
+    transform: rotate(-45deg) translate(0px);
+    transform-origin: center;
+}
+.arrow-up:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  display: block;
+  border-right: 1px solid currentColor;
+}
+/* 
+.info-link-arrow {
+  position: relative;
+  width: 15px;
+  height: 21px;
+  margin-left: 8px;
+}
+.info-link-arrow:before {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  width: 7px;
+  height: 7px;
+  border-top: 1px solid currentColor;
+  border-right: 1px solid currentColor;
+}
+.info-link-arrow:after {
+  content: '';
+  position: absolute;
+  bottom: 1px;
+  left: -0.5px;
+  width: 9.5px;
+  height: 21px;
+  background: transparent;
+  border-right: 1px solid currentColor;
+  transform: rotate(45deg);
+} */
+
+
+@media (max-width: 799px) {
+  .show-sm {
+    display: none !important;
+  }
+}
+@media (max-width: 999px) {
+  .show-md {
+    display: none !important;
+  }
+}
+@media (min-width: 1000px) {
+  .hide-md {
+    display: none !important;
+  }
+}
+
+
+.flickity-page-dot {
+  margin: 0 2px;
+  background-color: var(--white);
+  opacity: 0.5;
+}
+
+.flickity-page-dot.is-selected {
+  opacity: 1;
+}

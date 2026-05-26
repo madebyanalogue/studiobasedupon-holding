@@ -1,0 +1,159 @@
+@font-face {
+  font-family: 'Season Sans';
+  src:
+    url('/fonts/SeasonSans-Light.woff2') format('woff2'),
+    url('/fonts/SeasonSans-Light.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Season Sans';
+  src:
+    url('/fonts/SeasonSans-LightItalic.woff2') format('woff2'),
+    url('/fonts/SeasonSans-LightItalic.woff') format('woff');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Season Sans';
+  src:
+    url('/fonts/SeasonSans-Medium.woff2') format('woff2'),
+    url('/fonts/SeasonSans-Medium.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DM Mono';
+  src: url('/fonts/DMMono-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-body: 'Season Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  --tablet: var(--desktop)
+}
+
+.line-height-1 {
+  line-height: 1;
+}
+.line-height-11 {
+    line-height: 1.1;
+  }
+
+.mono {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+}
+.bold {
+    font-weight: bold;
+}
+
+.underline-links a {
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+    text-decoration-thickness: var(--underline-width);
+}
+
+.fluid-type {
+    font-size: calc(var(--mobile, 16) * 1px);
+}
+
+@media (min-width: 800px) and (max-width: 999px) {
+.fluid-type {
+    font-size: calc(var(--tablet, var(--mobile, 16)) * 1px);
+}
+}
+
+@media (min-width: 1000px) {
+.fluid-type {
+    /* Cap effective viewport with layout --max-width so type matches the centered shell, not 100vw alone */
+    --fluid-type-ref-width: min(
+        100vw,
+        var(--max-width),
+        calc(var(--fluid-max-vp, var(--fluid-type-max-vp)) * 1px)
+    );
+    font-size: clamp(
+    0px,
+    calc(
+        var(--fluid-type-ref-width) * var(--desktop, 32)
+        / var(--cap-vp, var(--fluid-type-cap-vp))
+    ),
+    min(
+        calc(var(--desktop, 32) * 1px),
+        calc(
+        var(--fluid-type-ref-width) * var(--desktop, 32)
+            / var(--cap-vp, var(--fluid-type-cap-vp))
+        )
+    )
+    );
+}
+}
+
+/* Subtitle row + optional leading marker — pair .subtitle with .mono / .fluid-type and dot colors */
+:root {
+  --subtitle-dot-color: currentColor;
+}
+
+.subtitle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75em;
+    font-size: 17px;
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+    letter-spacing: 0.01em;
+    padding-left: 0.1em;
+}
+@media (max-width: 699px) {
+  .subtitle.small {
+    font-size: 10px;
+  }
+}
+
+@media (min-width: 1000px) {
+  .page-section .subtitle {
+    padding-left: var(--gutter);
+  }
+}
+
+.subtitle--circle::before,
+.subtitle--square::before {
+  content: '';
+  flex-shrink: 0;
+  width: .75em;
+  height: .75em;
+  background-color: var(--subtitle-dot-color);
+}
+
+.subtitle--circle::before {
+  border-radius: 50%;
+}
+
+.subtitle--square::before {
+  border-radius: 0.1em;
+  width: .675em;
+  height: .675em;
+}
+.subtitle--square.twisted::before {
+  transform: rotate(30deg);
+}
+
+
+
+.next--button {
+  padding: .8em 1.2em;
+  border-radius: var(--rounded-button);
+  text-decoration: none;
+  background-color: var(--background-color);
+  color: var(--color);
+  border:1px solid var(--border-color);
+}
+.next--button.outline {
+  border: 1px solid currentColor;
+}
