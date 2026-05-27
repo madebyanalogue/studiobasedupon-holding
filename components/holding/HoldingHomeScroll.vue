@@ -621,8 +621,8 @@ body.has-home-scroll main.page-wrapper {
 
 /* Unscoped so NuxtImg-rendered images always receive sizing rules. */
 .holding-home--container {
-  --home-scroll-media-max-width: 600px;
-  --home-scroll-media-max-height: 600px;
+  --home-scroll-media-max-width: 60vw;
+  --home-scroll-media-max-height: 60vw;
   width:100%;
 }
 

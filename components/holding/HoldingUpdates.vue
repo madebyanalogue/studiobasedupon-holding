@@ -172,6 +172,8 @@
 <script setup>
 import gsap from 'gsap'
 
+const emit = defineEmits(['content-hidden'])
+
 const props = defineProps({
   title: {
     type: String,
@@ -280,18 +282,22 @@ function scheduleHideNewsItems() {
   hideDelayTimer = setTimeout(() => {
     hideDelayTimer = null
     if (!props.panelActive) {
-      hideNewsItems()
+      hideNewsItems(true)
     }
   }, props.panelTransitionDuration * 1000)
 }
 
-function hideNewsItems() {
+function hideNewsItems(emitHidden = false) {
   itemRevealTween?.kill()
 
   const items = getNewsItemElements()
-  if (!items.length) return
+  if (items.length) {
+    gsap.set(items, { autoAlpha: 0, y: ITEM_REVEAL.y })
+  }
 
-  gsap.set(items, { autoAlpha: 0, y: ITEM_REVEAL.y })
+  if (emitHidden) {
+    emit('content-hidden')
+  }
 }
 
 function revealNewsItems(startIndex = 0, delay = 0) {

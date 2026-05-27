@@ -344,7 +344,7 @@ header {
   pointer-events: all;
   background: rgb(var(--black));
   color: rgb(var(--white));
-  font-size: 18px;
+  font-size: 15px;
   line-height: 1.2;
   font-family: var(--font-body);
   padding: 1em 3em;
@@ -359,6 +359,11 @@ header {
   /* &:hover {
     background: rgb(var(--black));
   } */
+}
+@media all and (min-width: 700px) {
+  .home--updates-trigger {
+    font-size: 18px;
+  }
 }
 
 .home--updates-trigger.is-updates-open {

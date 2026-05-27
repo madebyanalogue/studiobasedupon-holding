@@ -42,6 +42,7 @@
           :news-items="newsItems"
           :panel-active="activePanel === 'updates'"
           :panel-transition-duration="PANEL_TRANSITION.duration"
+          @content-hidden="resetUpdatesPanelScroll"
         />
 
         <HoldingFooter
@@ -96,6 +97,14 @@ function openUpdates() {
   animatePanels('-100%')
 }
 
+function resetUpdatesPanelScroll() {
+  const panel = updatesPanelRef.value
+  if (!panel) return
+
+  panel.scrollTop = 0
+  panel.scrollLeft = 0
+}
+
 function openHome() {
   if (!process.client || activePanel.value === 'home') return
 
@@ -104,9 +113,12 @@ function openHome() {
   animatePanels('0%')
 }
 
-const panelTriggerLabel = computed(() =>
-  activePanel.value === 'updates' ? 'Gallery' : 'Updates',
-)
+const panelTriggerLabel = computed(() => {
+  const updatesLabel = holding.value?.panelSwitchUpdatesLabel?.trim() || 'Updates'
+  const homeLabel = holding.value?.panelSwitchHomeLabel?.trim() || 'Home'
+
+  return activePanel.value === 'updates' ? homeLabel : updatesLabel
+})
 
 function togglePanel() {
   if (!process.client) return
@@ -121,6 +133,8 @@ function togglePanel() {
 
 const HOLDING_QUERY = `{
   "holding": *[_type == "holdingPage"][0] {
+    panelSwitchUpdatesLabel,
+    panelSwitchHomeLabel,
     updatesTitle,
     signupText,
     signupTitle,
