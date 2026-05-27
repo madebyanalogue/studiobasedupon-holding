@@ -19,6 +19,12 @@
 
 @media (min-width: 700px) {
   :root {
+    --gutter: 70px;
+  }
+}
+
+@media (min-width: 1000px) {
+  :root {
     --gutter: 40px;
   }
 }

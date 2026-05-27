@@ -201,6 +201,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  panelTransitionDuration: {
+    type: Number,
+    default: 0.6,
+  },
 })
 
 const name = ref('')
@@ -220,11 +224,11 @@ const ITEM_REVEAL = {
   stagger: 0.18,
   ease: 'power2.out',
   y: 24,
-  openDelay: 0.35,
   batchDelay: 0.3,
 }
 
 let itemRevealTween = null
+let hideDelayTimer = null
 
 const visibleItems = computed(() => props.newsItems.slice(0, visibleCount.value))
 const hasMore = computed(() => visibleCount.value < props.newsItems.length)
@@ -263,6 +267,24 @@ function getNewsItemElements(startIndex = 0) {
   return startIndex > 0 ? items.slice(startIndex) : items
 }
 
+function cancelScheduledHide() {
+  if (hideDelayTimer) {
+    clearTimeout(hideDelayTimer)
+    hideDelayTimer = null
+  }
+}
+
+function scheduleHideNewsItems() {
+  cancelScheduledHide()
+
+  hideDelayTimer = setTimeout(() => {
+    hideDelayTimer = null
+    if (!props.panelActive) {
+      hideNewsItems()
+    }
+  }, props.panelTransitionDuration * 1000)
+}
+
 function hideNewsItems() {
   itemRevealTween?.kill()
 
@@ -299,11 +321,12 @@ watch(
     if (!process.client) return
 
     if (isActive) {
-      revealNewsItems(0, ITEM_REVEAL.openDelay)
+      cancelScheduledHide()
+      revealNewsItems(0, props.panelTransitionDuration)
       return
     }
 
-    hideNewsItems()
+    scheduleHideNewsItems()
   },
 )
 
@@ -314,11 +337,12 @@ onMounted(() => {
   hideNewsItems()
 
   if (props.panelActive) {
-    revealNewsItems(0, ITEM_REVEAL.openDelay)
+    revealNewsItems(0, props.panelTransitionDuration)
   }
 })
 
 onBeforeUnmount(() => {
+  cancelScheduledHide()
   itemRevealTween?.kill()
 })
 

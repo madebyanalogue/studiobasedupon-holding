@@ -39,8 +39,22 @@ h2 {
 :root {
   --screen-width: calc(100vw - var(--gutter) * 2);
   --type-unit: calc(var(--screen-width) / 100);
-  --text-update: calc(var(--type-unit) * 1.5);
-  --text-overlay: calc(var(--type-unit) * 1.25);
+  --text-update: clamp(16px, 4vw, 20px);
+  --text-overlay: 14px;
+}
+
+@media all and (min-width: 700px) {
+  :root {
+    --text-update: 20px;
+    --text-overlay: 20px;
+  }
+}
+
+@media all and (min-width: 1000px) {
+  :root {
+    --text-update: calc(var(--type-unit) * 1.5);
+    --text-overlay: calc(var(--type-unit) * 1.25);
+  }
 }
 
 

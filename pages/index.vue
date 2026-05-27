@@ -41,6 +41,7 @@
           :thank-you-message="holding?.newsletterThankYouMessage"
           :news-items="newsItems"
           :panel-active="activePanel === 'updates'"
+          :panel-transition-duration="PANEL_TRANSITION.duration"
         />
 
         <HoldingFooter

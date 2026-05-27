@@ -474,25 +474,6 @@ header {
     transition: all 0.6s ease;
   }
 }
-
-
-.home-updates-section {
-  padding: 130px 0px 0px;
-  display:grid;
-  gap: 100px;
-}
-
-.updates-grid {
-  display: flex;
-  flex-direction: column;
-  gap:20px;
-}
-
-@media all and (min-width: 1000px) {
-.home-newsletter-container {
-  padding-right:50px;
-}
-}
 .hr {
   width:80px;
   height:1px;
@@ -508,15 +489,48 @@ header {
   display: grid;
   grid-template-columns: 1fr;
   gap: 20px;
+  line-height: 1.4;
+}
+
+@media all and (max-width: 999px) {
+  .update-item {
+    line-height: 1.4;
+  }
+}
+
+.home-updates-section {
+  padding: 130px 0px 0px;
+  display:grid;
+  gap: 100px;
+}
+
+.updates-grid {
+  display: flex;
+  flex-direction: column;
+  gap:20px;
+}
+@media all and (min-width: 700px) {
+.updates-grid {
+  gap:50px;
+}
+.updates-row {
+  gap:50px;
+}
 }
 
 
+
 @media all and (min-width: 1000px) {
+
+.home-newsletter-container {
+  padding-right:50px;
+}
   .updates-grid {
     gap: 80px;
   }
   .updates-row {
     grid-template-columns: repeat(24, 1fr);
+    gap:20px;
   }
   .update-item {
     grid-template-columns: 1fr auto;
@@ -533,9 +547,15 @@ header {
   align-items: center;
   justify-content: center;
   font-size: var(--text-update);
-  padding: 2em;
+  padding: 2.5em;
   text-align: left;
-  aspect-ratio:3/4;
+  }
+
+  @media all and (min-width: 1000px) {
+    .update-item-text-container {
+      aspect-ratio:3/4;
+      padding: 3em 2em;
+    }
   }
 .update-item-media {
   position: relative;
@@ -553,29 +573,33 @@ header {
 }
 
 .update-item-overlay {
-  position: absolute;
+  position: relative;
   inset: 0;
   display: flex;
   align-items: end;
   justify-content: center;
-  padding: 2em;
-  font-size: clamp(16px, 1.8vw, 18px);
-  background: linear-gradient(to top, rgb(0 0 0), transparent);
-  opacity: 0;
-  color: rgb(var(--white));
+  padding: 1.5em 0px 1em 0px;
   transition: opacity 0.3s ease;
   overflow: auto;
   pointer-events: none;
   font-size: var(--text-overlay);
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .update-item-media:hover .update-item-overlay,
-  .update-item-media:focus-visible .update-item-overlay {
-    opacity: 1;
+@media all and (min-width: 1000px) {
+  .update-item-overlay {
+    position: absolute;
+    padding: 2em;
+    background: linear-gradient(to top, rgb(0 0 0), transparent);
+    opacity: 0;
+    color: rgb(var(--white));
   }
 }
 
+@media all and (max-width: 999px) {
+  .update-item-timestamp-container {
+    display: none;
+  }
+}
 
 @media all and (max-width: 699px) {
   .show-sm {
