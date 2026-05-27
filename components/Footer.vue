@@ -22,9 +22,6 @@
       </div>
     </div>
 
-    <div class="show-sm" />
-    <div class="show-md" />
-
 
     <div class="flex between-xs bottom-xs reverse-md gap-60">
 

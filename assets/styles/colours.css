@@ -3,7 +3,7 @@
   --off-white: 241, 237, 228;
   --black: 0, 0, 0;
   --white: 255, 255, 255;
-  --background-color: rgb(var(--white));
+  --background-color: rgb(var(--black));
   --text-color: rgb(var(--black));
 }
 

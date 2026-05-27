@@ -7,8 +7,7 @@
         {{ copyright }}
       </div>
     </div>
-    <div data-holding-header-end class="header-social-links">
-      <span data-holding-follow-label>Follow</span>
+    <div data-holding-header-end class="show-sm">
       <HoldingSocialLinks :social-links="socialLinks" />
     </div>
   </header>
@@ -37,41 +36,25 @@ header {
   gap: 10px;
   align-items: center;
   justify-content: space-between;
-  padding: var(--gutter);
-  padding-left: calc(var(--gutter) * 1.5);
+  padding: 15px 20px;
+  padding-right: calc(var(--gutter) * .5);
 }
-.header-title, .header-social-links {
+@media all and (max-width: 699px) {
+.header-title {
+  width:100%;
+  justify-content: space-between;
+}
+}
+@media all and (min-width: 700px) {
+  header {
+    padding: calc(var(--gutter) * .5) var(--gutter);
+  }
+}
+
+.header-title {
   display: flex;
   flex-direction: row;
   gap: 20px;
   align-items: center;
-}
-.header-social-links ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
-  align-items: center;
-}
-.header-social-links ul li {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  align-items: center;
-}
-.header-social-links:deep(a) {
-  display: block;
-  width: var(--icon-size);
-  height: var(--icon-size);
-  background: red;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.header-social-links:deep(img) {
-  display: block;
 }
 </style>

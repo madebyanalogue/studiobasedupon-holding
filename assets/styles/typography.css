@@ -30,7 +30,25 @@ body {
   font-size: 14px;
   line-height: 1.2;
 }
+h2 {
+  font-size: clamp(32px, 5vw,66px);
+  font-weight: bold;
+}
 
+
+:root {
+  --screen-width: calc(100vw - var(--gutter) * 2);
+  --type-unit: calc(var(--screen-width) / 100);
+  --text-update: calc(var(--type-unit) * 1.5);
+  --text-overlay: calc(var(--type-unit) * 1.25);
+}
+
+
+@media (min-width: 1600px) {
+  :root {
+    --screen-width: calc(1600px - var(--gutter) * 2);
+  }
+}
 
 
 
@@ -54,6 +72,9 @@ body {
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
     text-decoration-thickness: var(--underline-width);
+}
+.underline-links a:hover, .red-link a:hover {
+  color: rgb(var(--red));
 }
 
 .fluid-type {

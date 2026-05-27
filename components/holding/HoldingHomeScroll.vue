@@ -1,6 +1,6 @@
 <template>
   <section class="home-scroll-section">
-    <div ref="rootRef" class="home--container">
+    <div ref="rootRef" class="home--container holding-home--container">
       <div class="logo home--logo">
         <div class="home--logo-inner">
           <NuxtImg
@@ -19,16 +19,34 @@
           v-for="item in items"
           :key="item._key"
           class="media"
+          :class="getMediaOrientationClass(item.image)"
         >
           <div class="media-content">
             <NuxtImg
               v-if="getImageUrl(item.image)"
               :src="getImageUrl(item.image)"
               :alt="item.title || ''"
+              class="home--scroll-media-image"
             />
           </div>
         </div>
       </div>
+
+      <div
+        v-if="hasItems"
+        ref="scrollOverlayRef"
+        class="home--scroll-overlay"
+        aria-hidden="true"
+      />
+    </div>
+
+    <div class="progressive-blur" style="bottom:100%;">
+      <div class="progressive-blur__layer is--1" />
+      <div class="progressive-blur__layer is--2" />
+      <div class="progressive-blur__layer is--3" />
+      <div class="progressive-blur__layer is--4" />
+      <div class="progressive-blur__layer is--5" />
+      <div class="progressive-blur__backdrop" />
     </div>
 
   </section>
@@ -55,6 +73,7 @@ const props = defineProps({
 
 const rootRef = ref(null)
 const containerRef = ref(null)
+const scrollOverlayRef = ref(null)
 
 const { getImageSrc } = useSanityImage()
 
@@ -63,11 +82,158 @@ const getImageUrl = (imageSource) => {
   return getImageSrc(imageSource.asset) || ''
 }
 
+function getMediaOrientationClass(imageSource) {
+  const width = imageSource?.asset?.metadata?.dimensions?.width
+  const height = imageSource?.asset?.metadata?.dimensions?.height
+  if (!width || !height) {
+    return ''
+  }
+
+  return height > width ? 'is-portrait' : 'is-landscape'
+}
+
 const logoUrl = computed(() => getImageUrl(props.logo))
 const logoAlt = computed(() => props.logo?.alt || '')
 const hasLogoText = computed(() => Boolean(props.logoText?.trim()))
 
 const hasItems = computed(() => Array.isArray(props.items) && props.items.length > 0)
+
+/** Page-load intro — each element has its own delay + duration (seconds from page load). */
+const HOLDING_INTRO = {
+  ease: 'power2.out',
+  logo:           { delay: 0, duration: 2 },
+  overlay:        { delay: 1, duration: 3.0 },
+  header:         { delay: 0, duration: 1 },
+  updatesButton:  { delay: 1.5, duration: 1 },
+  logoText:       { delay: 1.5, duration: 1 },
+  pointerEvents:  { delay: 0.8 },
+}
+
+let introTimeline = null
+
+function getIntroDelay(step) {
+  return step?.delay ?? 0
+}
+
+function runHoldingIntro() {
+  if (!process.client || !rootRef.value) {
+    return Promise.resolve()
+  }
+
+  const root = rootRef.value
+  const logoEl = root.querySelector('.home--logo')
+  const overlayEl = scrollOverlayRef.value
+  const headerEl = document.querySelector('[data-holding-header]')
+  const updatesButtonEl = document.querySelector('.home--updates-trigger')
+  const logoTextEl = root.querySelector('.home--logo-text')
+
+  document.body.classList.add('holding-intro', 'holding-chrome-hidden')
+  document.body.classList.remove('holding-intro-complete')
+
+  if (logoEl) gsap.set(logoEl, { opacity: 0 })
+  if (headerEl) gsap.set(headerEl, { opacity: 0 })
+  if (updatesButtonEl) gsap.set(updatesButtonEl, { opacity: 0 })
+  if (logoTextEl) gsap.set(logoTextEl, { opacity: 0 })
+  if (overlayEl) gsap.set(overlayEl, { opacity: 1 })
+
+  const enablePointerEvents = () => {
+    document.body.classList.remove('holding-intro')
+  }
+
+  const finishIntro = () => {
+    document.body.classList.remove('holding-chrome-hidden')
+    document.body.classList.add('holding-intro-complete')
+
+    if (updatesButtonEl) gsap.set(updatesButtonEl, { opacity: 1 })
+    if (headerEl) gsap.set(headerEl, { opacity: 1 })
+    if (logoTextEl) gsap.set(logoTextEl, { opacity: 1 })
+  }
+
+  if (!logoEl && !headerEl && !updatesButtonEl && !overlayEl) {
+    enablePointerEvents()
+    finishIntro()
+    return Promise.resolve()
+  }
+
+  return new Promise((resolve) => {
+    introTimeline?.kill()
+    introTimeline = gsap.timeline({
+      onComplete: () => {
+        finishIntro()
+        resolve()
+      },
+    })
+
+    if (logoEl) {
+      introTimeline.to(
+        logoEl,
+        {
+          opacity: 1,
+          duration: HOLDING_INTRO.logo.duration,
+          ease: HOLDING_INTRO.ease,
+        },
+        getIntroDelay(HOLDING_INTRO.logo),
+      )
+    }
+
+    introTimeline.call(
+      enablePointerEvents,
+      null,
+      getIntroDelay(HOLDING_INTRO.pointerEvents),
+    )
+
+    if (overlayEl) {
+      introTimeline.to(
+        overlayEl,
+        {
+          opacity: 0,
+          duration: HOLDING_INTRO.overlay.duration,
+          ease: HOLDING_INTRO.ease,
+          onComplete: () => {
+            overlayEl.style.visibility = 'hidden'
+          },
+        },
+        getIntroDelay(HOLDING_INTRO.overlay),
+      )
+    }
+
+    if (headerEl) {
+      introTimeline.to(
+        headerEl,
+        {
+          opacity: 1,
+          duration: HOLDING_INTRO.header.duration,
+          ease: HOLDING_INTRO.ease,
+        },
+        getIntroDelay(HOLDING_INTRO.header),
+      )
+    }
+
+    if (updatesButtonEl) {
+      introTimeline.to(
+        updatesButtonEl,
+        {
+          opacity: 1,
+          duration: HOLDING_INTRO.updatesButton.duration,
+          ease: HOLDING_INTRO.ease,
+        },
+        getIntroDelay(HOLDING_INTRO.updatesButton),
+      )
+    }
+
+    if (logoTextEl) {
+      introTimeline.to(
+        logoTextEl,
+        {
+          opacity: 1,
+          duration: HOLDING_INTRO.logoText.duration,
+          ease: HOLDING_INTRO.ease,
+        },
+        getIntroDelay(HOLDING_INTRO.logoText),
+      )
+    }
+  })
+}
 
 /** Animation tuning — z density is fixed via zSpacing, not item count. */
 const HOME_SCROLL = {
@@ -281,12 +447,7 @@ function tick(_time, dt) {
   tl.time(incr)
 }
 
-onMounted(() => {
-  handleResize()
-  if (typeof window !== 'undefined') {
-    window.addEventListener('resize', handleResize)
-  }
-
+function initHomeScroll() {
   if (!hasItems.value || !rootRef.value) {
     return
   }
@@ -376,6 +537,8 @@ onMounted(() => {
     }
   })
 
+  tl.time(incr)
+
   if (HOME_SCROLL.enableHover) {
     bindMediaHover(medias, manageZIndex)
   }
@@ -399,13 +562,22 @@ onMounted(() => {
     root.classList.remove('mobile')
     root.classList.add('desktop')
   }
+}
 
-  requestAnimationFrame(() => {
-    root.classList.add('ready')
-  })
+onMounted(async () => {
+  handleResize()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', handleResize)
+  }
+
+  initHomeScroll()
+  await runHoldingIntro()
 })
 
 onUnmounted(() => {
+  introTimeline?.kill()
+  introTimeline = null
+
   hoveredMedia = null
   mediaPointerCleanups.forEach((cleanup) => cleanup())
   mediaPointerCleanups = []
@@ -419,6 +591,7 @@ onUnmounted(() => {
   if (typeof document !== 'undefined') {
     document.body.classList.remove('has-home-scroll')
     document.body.classList.remove('no-smooth')
+    document.body.classList.remove('holding-intro', 'holding-chrome-hidden', 'holding-intro-complete')
   }
 
   if (tl) {
@@ -445,15 +618,51 @@ body.has-home-scroll main.page-wrapper {
   min-height: unset !important;
   padding-top: 0 !important;
 }
+
+/* Unscoped so NuxtImg-rendered images always receive sizing rules. */
+.holding-home--container {
+  --home-scroll-media-max-width: 600px;
+  --home-scroll-media-max-height: 600px;
+  width:100%;
+}
+
+@media (min-width: 700px) {
+  .holding-home--container {
+    --home-scroll-media-max-width: 60vw;
+    --home-scroll-media-max-height: 60vw;
+  }
+}
+
+@media (min-width: 1000px) {
+  .holding-home--container {
+    --home-scroll-media-max-width: 62vw;
+    --home-scroll-media-max-height: 62vw;
+  }
+}
+
+.holding-home--container .media:not(.is-portrait):not(.is-landscape) .home--scroll-media-image {
+  max-width: var(--home-scroll-media-max-width);
+  max-height: var(--home-scroll-media-max-height);
+  width: auto;
+  height: auto;
+}
 </style>
 
 <style scoped>
+.home--scroll-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  background: rgb(var(--white));
+  pointer-events: none;
+}
+
 .home--logo {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1;
+  z-index: 3;
   pointer-events: none;
 }
 
@@ -506,9 +715,7 @@ body.has-home-scroll main.page-wrapper {
   pointer-events: none;
 }
 
-.home--container .media {
-  width: 42%;
-  height: auto;
+.holding-home--container .media {
   position: absolute;
   transform: translateZ(calc(-1 * var(--home-scroll-z-depth, 1400vw)));
   z-index: 2;
@@ -516,8 +723,14 @@ body.has-home-scroll main.page-wrapper {
   opacity: 0;
 }
 
-.home--container.ready .media {
-  opacity: 1;
+.holding-home--container .media.is-landscape {
+  width: var(--home-scroll-media-max-width);
+  height: auto;
+}
+
+.holding-home--container .media.is-portrait {
+  width: var(--home-scroll-media-max-width);
+  height: auto;
 }
 
 .home--container .media-content {
@@ -526,25 +739,31 @@ body.has-home-scroll main.page-wrapper {
   z-index: 2;
 }
 
-.home--container .media img {
+.holding-home--container .media.is-landscape .home--scroll-media-image {
   width: 100%;
   height: auto;
+  max-width: 100%;
+  max-height: none;
+}
+
+.holding-home--container .media.is-portrait .home--scroll-media-image {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: none;
+}
+
+@media (max-width: 768px) {
+  .holding-home--container .media {
+    z-index: 2;
+  }
+}
+
+.holding-home--container .home--scroll-media-image {
   display: block;
   /* box-shadow: 1px 1px 30px rgba(0, 0, 0, 0.08); */
   transition: transform 0.6s ease;
   transform-origin: bottom;
 }
 
-@media (min-width: 1023px) {
-  .home--container .media {
-    width: min(62vw, 1800px);
-  }
-}
-
-@media (max-width: 768px) {
-  .home--container .media {
-    width: 62%;
-    z-index: 2;
-  }
-}
 </style>

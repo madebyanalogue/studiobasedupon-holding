@@ -1,6 +1,20 @@
 <template>
   <div data-holding-page :data-holding-active-panel="activePanel">
+    <HoldingHeader
+      :site-title="siteTitle"
+      :social-links="socialLinks"
+    />
+
     <div data-holding-panels>
+
+
+      <HoldingPanelTrigger
+        :label="panelTriggerLabel"
+        :is-open="activePanel === 'updates'"
+        trigger="updates"
+        @click="togglePanel"
+      />
+      
       <section
         ref="homePanelRef"
         data-holding-panel="home"
@@ -12,32 +26,34 @@
           :logo="holding?.homeScrollLogo"
           :logo-text="holding?.homeScrollLogoText"
         />
-
-        <HoldingPanelTrigger label="Updates" trigger="updates" @click="openUpdates" />
       </section>
 
       <section
         ref="updatesPanelRef"
         data-holding-panel="updates"
-        class="home-updates-section"
+        class="home-updates-section off-white"
         :aria-hidden="activePanel !== 'updates'"
       >
         <HoldingUpdates
           :title="holding?.updatesTitle"
+          :signup-text="holding?.signupText"
+          :signup-title="holding?.signupTitle"
           :thank-you-message="holding?.newsletterThankYouMessage"
           :news-items="newsItems"
+          :panel-active="activePanel === 'updates'"
         />
 
         <HoldingFooter
           :site-title="siteTitle"
           :description="holding?.footerDescription"
           :legal="holding?.footerLegal"
+          :subfooter-content="holding?.subfooterContent"
           :contact-items="holding?.footerContact || []"
           :social-links="socialLinks"
         />
 
-        <HoldingPanelTrigger label="Home" trigger="home" @click="openHome" />
       </section>
+
     </div>
   </div>
 </template>
@@ -45,6 +61,10 @@
 <script setup>
 import gsap from 'gsap'
 import { injectPageLoading } from '~/composables/usePageLoading'
+
+definePageMeta({
+  pageTransition: false,
+})
 
 const { setLoading } = injectPageLoading()
 
@@ -83,17 +103,32 @@ function openHome() {
   animatePanels('0%')
 }
 
-const year = new Date().getFullYear()
+const panelTriggerLabel = computed(() =>
+  activePanel.value === 'updates' ? 'Gallery' : 'Updates',
+)
+
+function togglePanel() {
+  if (!process.client) return
+
+  if (activePanel.value === 'updates') {
+    openHome()
+  } else {
+    openUpdates()
+  }
+}
+
 
 const HOLDING_QUERY = `{
   "holding": *[_type == "holdingPage"][0] {
     updatesTitle,
+    signupText,
+    signupTitle,
     newsletterThankYouMessage,
     footerDescription,
     footerLegal,
+    subfooterContent,
     footerContact[] {
       _key,
-      title,
       linkText,
       link {
         type,
@@ -161,10 +196,11 @@ const HOLDING_QUERY = `{
     title,
     seoTitle
   },
-  "news": *[_type == "news"] | order(orderRank) {
+  "news": *[_type == "news"] | order(orderRank asc) {
     _id,
     title,
     content,
+    orderRank,
     _createdAt,
     featuredImage {
       asset-> {
@@ -185,7 +221,7 @@ const HOLDING_QUERY = `{
 const { data, pending } = await useAsyncData('holding-page', async () => {
   const result = await $fetch('/api/sanity/query', {
     method: 'POST',
-    body: { query: HOLDING_QUERY },
+    body: { query: HOLDING_QUERY, useCdn: false },
   })
   return result?.result || null
 })
@@ -200,20 +236,6 @@ const settings = computed(() => data.value?.settings || null)
 const siteTitle = computed(() => settings.value?.title || settings.value?.seoTitle || 'Studio Based Upon')
 const socialLinks = computed(() => holding.value?.socialLinks || [])
 const homeScrollItems = computed(() => holding.value?.homeScrollItems || [])
-
-const holdingHeader = useState('holding-header')
-
-watch(
-  [siteTitle, socialLinks],
-  () => {
-    holdingHeader.value = {
-      siteTitle: siteTitle.value,
-      year: year,
-      socialLinks: socialLinks.value,
-    }
-  },
-  { immediate: true },
-)
 
 function blocksToPlainText(blocks) {
   if (!Array.isArray(blocks)) return ''
@@ -233,23 +255,43 @@ function formatTimestamp(iso) {
   if (!iso) return ''
   const date = new Date(iso)
   if (Number.isNaN(date.getTime())) return ''
-  return date.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
+
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/London',
+      hour: '2-digit',
+      minute: '2-digit',
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit',
+      hour12: false,
+    }).formatToParts(date).map(({ type, value }) => [type, value]),
+  )
+
+  return `${parts.hour}:${parts.minute} - ${parts.day} / ${parts.month} / ${parts.year}`
+}
+
+function compareOrderRank(a, b) {
+  const rankA = a?.orderRank || ''
+  const rankB = b?.orderRank || ''
+  if (!rankA && !rankB) return 0
+  if (!rankA) return 1
+  if (!rankB) return -1
+  return rankA.localeCompare(rankB)
 }
 
 const newsItems = computed(() =>
-  (data.value?.news || []).map((item) => {
-    const excerpt = item.title || blocksToPlainText(item.content)
-    return {
-      ...item,
-      excerpt,
-      timestamp: item._createdAt || '',
-      timestampLabel: formatTimestamp(item._createdAt),
-    }
-  }),
+  [...(data.value?.news || [])]
+    .sort(compareOrderRank)
+    .map((item) => {
+      const excerpt = item.title || blocksToPlainText(item.content)
+      return {
+        ...item,
+        excerpt,
+        timestamp: item._createdAt || '',
+        timestampLabel: formatTimestamp(item._createdAt),
+      }
+    }),
 )
 
 defineExpose({
@@ -258,5 +300,6 @@ defineExpose({
   updatesPanelRef,
   openUpdates,
   openHome,
+  togglePanel,
 })
 </script>
