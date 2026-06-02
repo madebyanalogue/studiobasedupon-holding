@@ -616,6 +616,12 @@ header {
   opacity: 1;
 }
 
+@media (hover: hover) and (min-width: 1000px) {
+  .update-item-media:hover .update-item-overlay {
+    opacity: 1;
+  }
+}
+
 .update-item-text-container :is(p, .sanity-block) {
   margin: 0;
 }
