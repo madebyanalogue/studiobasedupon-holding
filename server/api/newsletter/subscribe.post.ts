@@ -78,7 +78,7 @@ async function resolveTagName(apiKey: string, tagId: string, fallbackName?: stri
   }
 
   try {
-    const result = await $fetch<{ tags?: Array<{ id?: number; name?: string }> } }>(
+    const result = await $fetch<{ tags?: Array<{ id?: number; name?: string }> }>(
       `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/lists/${MAILCHIMP_LIST_ID}/tag-search`,
       {
         headers: mailchimpHeaders(apiKey),
