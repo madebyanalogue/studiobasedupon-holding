@@ -22,6 +22,9 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
+    mailchimpApiKey: process.env.NUXT_MAILCHIMP_API_KEY || '',
+    mailchimpTagId: process.env.NUXT_MAILCHIMP_TAG_ID || '3531655',
+    mailchimpTagName: process.env.NUXT_MAILCHIMP_TAG_NAME || '',
     public: {
       sanity: {
         projectId: 'b6xol4su',

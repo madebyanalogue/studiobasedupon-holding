@@ -746,7 +746,7 @@ header {
 
 
 
-.holding-newsletter-form input,
+.holding-newsletter-form input:not([type='checkbox']),
 .holding-newsletter-form button {
   border: 1px solid;
   padding: 1px 1em 0;

@@ -16,7 +16,7 @@
               class="mono"
               data-holding-newsletter-thank-you
             >
-              {{ thankYouMessage }}
+              {{ successMessage || thankYouMessage }}
             </p>
             <p
               v-else-if="submitError"
@@ -44,7 +44,7 @@
                 <input
                   v-model="firstName"
                   type="text"
-                  name="FNAME"
+                  name="MMERGE2"
                   placeholder="First name"
                   autocomplete="given-name"
                   aria-label="First name"
@@ -55,7 +55,7 @@
                 <input
                   v-model="lastName"
                   type="text"
-                  name="LNAME"
+                  name="MMERGE1"
                   placeholder="Last name"
                   autocomplete="family-name"
                   aria-label="Last name"
@@ -74,6 +74,17 @@
                   :disabled="isSubmitting"
                 >
               </label>
+              <input
+                v-model="marketingConsent"
+                type="checkbox"
+                name="gdpr[37]"
+                value="Y"
+                data-holding-newsletter-consent
+                class="holding-newsletter-consent-input"
+                tabindex="-1"
+                aria-hidden="true"
+                :disabled="isSubmitting"
+              >
               <button
                 type="submit"
                 data-holding-newsletter-submit
@@ -264,6 +275,8 @@ const props = defineProps({
 const firstName = ref('')
 const lastName = ref('')
 const email = ref('')
+const marketingConsent = ref(true)
+const successMessage = ref('')
 const submitted = ref(false)
 const isSubmitting = ref(false)
 const submitError = ref('')
@@ -430,7 +443,7 @@ async function submitNewsletter() {
   isSubmitting.value = true
 
   try {
-    await $fetch('/api/newsletter/subscribe', {
+    const result = await $fetch('/api/newsletter/subscribe', {
       method: 'POST',
       body: {
         firstName: firstName.value.trim(),
@@ -438,6 +451,7 @@ async function submitNewsletter() {
         email: email.value.trim(),
       },
     })
+    successMessage.value = result?.message || ''
     submitted.value = true
   } catch (error) {
     const fetchError = error
@@ -464,6 +478,18 @@ async function submitNewsletter() {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
+}
+
+.holding-newsletter-consent-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 @media all and (max-width: 699px) {
