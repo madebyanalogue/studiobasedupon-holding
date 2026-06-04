@@ -603,6 +603,7 @@ header {
 
 .update-item-media-container {
   position: relative;
+  overflow: hidden;
 }
 
 .update-item-overlay {
