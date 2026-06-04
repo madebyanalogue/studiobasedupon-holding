@@ -312,6 +312,7 @@ body.has-home-scroll .footer-back-to-top {
   justify-content: center;
   align-items: center;
   pointer-events: none;
+  width: 100%;
 }
 
 .home--container {

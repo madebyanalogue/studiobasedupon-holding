@@ -106,7 +106,7 @@
                 alt=""
                 class="info-news-image"
               />
-              <SanityBlocks v-if="item.content" :blocks="item.content" class="info-news-content" />
+              <SanityBlocks v-if="hasNewsCaption(item.content)" :blocks="item.content" class="info-news-content" />
             </div>
           </div>
         </div>
@@ -218,6 +218,16 @@ const shouldOpenInNewTab = (link, openInNewTab) => {
   // For external URLs (http/https), open in new tab
   if (link.startsWith('http://') || link.startsWith('https://') || link.startsWith('//')) return true
   return false
+}
+
+function hasNewsCaption(blocks) {
+  if (!Array.isArray(blocks)) return false
+
+  return blocks.some((block) => {
+    if (block?._type !== 'block') return true
+
+    return (block.children || []).some((child) => child?._type === 'span' && child.text?.trim())
+  })
 }
 </script>
 

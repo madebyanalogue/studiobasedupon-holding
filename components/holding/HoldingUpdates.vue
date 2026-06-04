@@ -104,17 +104,24 @@
             class="update-item"
             :class="item.featuredImage?.asset?.url ? 'update-item--image' : 'update-item--text'"
           >
-            <div
+            <component
+              :is="item.link ? 'a' : 'div'"
               v-if="item.featuredImage?.asset?.url"
               class="update-item-media"
-              :class="{ 'is-active': activeOverlayId === item._id }"
-              tabindex="0"
-              role="button"
-              :aria-expanded="activeOverlayId === item._id ? 'true' : 'false'"
-              :aria-label="item.title || 'View update description'"
-              @click="toggleImageOverlay(item._id)"
-              @keydown.enter.prevent="toggleImageOverlay(item._id)"
-              @keydown.space.prevent="toggleImageOverlay(item._id)"
+              :class="{
+                'is-active': item.hasCaption && !item.link && activeOverlayId === item._id,
+                'update-item-media--linked': item.link,
+              }"
+              :href="item.link || undefined"
+              :target="item.link ? '_blank' : undefined"
+              :rel="item.link ? 'noopener noreferrer' : undefined"
+              :tabindex="item.hasCaption && !item.link ? 0 : undefined"
+              :role="item.hasCaption && !item.link ? 'button' : undefined"
+              :aria-expanded="item.hasCaption && !item.link ? (activeOverlayId === item._id ? 'true' : 'false') : undefined"
+              :aria-label="item.hasCaption && !item.link ? (item.title || 'View update description') : undefined"
+              @click="item.hasCaption && !item.link && toggleImageOverlay(item._id)"
+              @keydown.enter.prevent="item.hasCaption && !item.link && toggleImageOverlay(item._id)"
+              @keydown.space.prevent="item.hasCaption && !item.link && toggleImageOverlay(item._id)"
             >
               <div class="update-item-media-container">
                 <NuxtImg
@@ -123,23 +130,32 @@
                   data-holding-news-image
                 />
                 <div
-                  v-if="item.content?.length"
+                  v-if="item.hasCaption"
                   class="update-item-overlay"
                   data-holding-news-overlay
                 >
                   <SanityBlocks :blocks="item.content" />
                 </div>
               </div>
-            </div>
-            <div v-else data-holding-news-text class="update-item-text">
+            </component>
+            <component
+              :is="item.link ? 'a' : 'div'"
+              v-else
+              data-holding-news-text
+              class="update-item-text"
+              :class="{ 'update-item-text--linked': item.link }"
+              :href="item.link || undefined"
+              :target="item.link ? '_blank' : undefined"
+              :rel="item.link ? 'noopener noreferrer' : undefined"
+            >
               <div class="update-item-text-container">
                 <SanityBlocks
-                  v-if="item.content?.length"
+                  v-if="item.hasCaption"
                   :blocks="item.content"
                   data-holding-news-content
                 />
               </div>
-            </div>
+            </component>
             <div class="update-item-timestamp-container">
               <time
                 v-if="item.timestamp"

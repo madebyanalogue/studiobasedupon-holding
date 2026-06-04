@@ -1,6 +1,6 @@
 <template>
   <section class="home-scroll-section">
-    <div ref="rootRef" class="home--container holding-home--container">
+    <div ref="rootRef" class="home--container holding-home--container" :class="{ 'is-scroll-ready': isScrollReady }">
       <div class="logo home--logo">
         <div class="home--logo-inner">
           <NuxtImg
@@ -40,7 +40,15 @@
       />
     </div>
 
-    <div class="progressive-blur" style="bottom:100%;">
+    <div class="progressive-blur">
+      <div class="progressive-blur__layer is--1" />
+      <div class="progressive-blur__layer is--2" />
+      <div class="progressive-blur__layer is--3" />
+      <div class="progressive-blur__layer is--4" />
+      <div class="progressive-blur__layer is--5" />
+      <div class="progressive-blur__backdrop" />
+    </div>
+    <div class="progressive-blur top">
       <div class="progressive-blur__layer is--1" />
       <div class="progressive-blur__layer is--2" />
       <div class="progressive-blur__layer is--3" />
@@ -74,6 +82,7 @@ const props = defineProps({
 const rootRef = ref(null)
 const containerRef = ref(null)
 const scrollOverlayRef = ref(null)
+const isScrollReady = ref(false)
 
 const { getImageSrc } = useSanityImage()
 
@@ -115,8 +124,9 @@ function getIntroDelay(step) {
   return step?.delay ?? 0
 }
 
-function runHoldingIntro() {
+function runHoldingIntro({ onReveal } = {}) {
   if (!process.client || !rootRef.value) {
+    onReveal?.()
     return Promise.resolve()
   }
 
@@ -151,8 +161,13 @@ function runHoldingIntro() {
 
   if (!logoEl && !headerEl && !updatesButtonEl && !overlayEl) {
     enablePointerEvents()
+    onReveal?.()
     finishIntro()
     return Promise.resolve()
+  }
+
+  const revealScroll = () => {
+    onReveal?.()
   }
 
   return new Promise((resolve) => {
@@ -183,6 +198,12 @@ function runHoldingIntro() {
     )
 
     if (overlayEl) {
+      introTimeline.call(
+        revealScroll,
+        null,
+        getIntroDelay(HOLDING_INTRO.overlay),
+      )
+
       introTimeline.to(
         overlayEl,
         {
@@ -195,6 +216,8 @@ function runHoldingIntro() {
         },
         getIntroDelay(HOLDING_INTRO.overlay),
       )
+    } else {
+      revealScroll()
     }
 
     if (headerEl) {
@@ -281,7 +304,36 @@ let hoveredMedia = null
 const mediaVisualTweens = new WeakMap()
 const mediaHoverTweens = new WeakMap()
 let mediaPointerCleanups = []
+let scrollTickerActive = false
 const isMobile = ref(false)
+
+function preloadHomeScrollImages(root) {
+  const imgs = [...root.querySelectorAll('.media img')]
+  imgs.forEach((img) => {
+    if (img.complete) {
+      img.decode?.().catch(() => undefined)
+      return
+    }
+
+    img.addEventListener('load', () => {
+      img.decode?.().catch(() => undefined)
+    }, { once: true })
+  })
+}
+
+function activateHomeScroll() {
+  if (!hasItems.value || !rootRef.value || !tl || isScrollReady.value) {
+    return
+  }
+
+  isScrollReady.value = true
+  tl.time(incr)
+
+  if (!scrollTickerActive && typeof window !== 'undefined') {
+    gsap.ticker.add(tick)
+    scrollTickerActive = true
+  }
+}
 
 function createHelixMeta(count) {
   if (count <= 0) return []
@@ -466,7 +518,10 @@ function initHomeScroll() {
   const mediasImg = root.querySelectorAll('.media img')
 
   mediasImg.forEach((img, index) => {
-    img.setAttribute('src', mediaArray.value[index])
+    const nextSrc = mediaArray.value[index]
+    if (nextSrc && img.getAttribute('src') !== nextSrc) {
+      img.setAttribute('src', nextSrc)
+    }
   })
 
   deltaTo = gsap.quickTo(deltaObject.value, 'delta', { duration: 2, ease: 'power1' })
@@ -492,6 +547,8 @@ function initHomeScroll() {
   const { fadeIn, hold, fadeOut, blurPx } = HOME_SCROLL
   const itemCycle = fadeIn + hold + fadeOut
   const staggerEach = getZStagger(itemCycle)
+
+  gsap.set(medias, { opacity: 0, filter: `blur(${blurPx}px)` })
 
   tl.to(medias, {
     z: 0,
@@ -537,14 +594,11 @@ function initHomeScroll() {
     }
   })
 
-  tl.time(incr)
-
   if (HOME_SCROLL.enableHover) {
     bindMediaHover(medias, manageZIndex)
   }
 
   if (typeof window !== 'undefined') {
-    gsap.ticker.add(tick)
     window.addEventListener('wheel', handleWheel, { passive: true })
   }
 
@@ -570,8 +624,12 @@ onMounted(async () => {
     window.addEventListener('resize', handleResize)
   }
 
-  initHomeScroll()
-  await runHoldingIntro()
+  if (hasItems.value && rootRef.value) {
+    initHomeScroll()
+    preloadHomeScrollImages(rootRef.value)
+  }
+
+  await runHoldingIntro({ onReveal: activateHomeScroll })
 })
 
 onUnmounted(() => {
@@ -582,10 +640,15 @@ onUnmounted(() => {
   mediaPointerCleanups.forEach((cleanup) => cleanup())
   mediaPointerCleanups = []
 
+  isScrollReady.value = false
+
   if (typeof window !== 'undefined') {
     window.removeEventListener('resize', handleResize)
     window.removeEventListener('wheel', handleWheel)
-    gsap.ticker.remove(tick)
+    if (scrollTickerActive) {
+      gsap.ticker.remove(tick)
+      scrollTickerActive = false
+    }
   }
 
   if (typeof document !== 'undefined') {
@@ -621,8 +684,8 @@ body.has-home-scroll main.page-wrapper {
 
 /* Unscoped so NuxtImg-rendered images always receive sizing rules. */
 .holding-home--container {
-  --home-scroll-media-max-width: 60vw;
-  --home-scroll-media-max-height: 60vw;
+  --home-scroll-media-max-width: 70vw;
+  --home-scroll-media-max-height: 70vw;
   width:100%;
 }
 
@@ -655,6 +718,12 @@ body.has-home-scroll main.page-wrapper {
   z-index: 2;
   background: rgb(var(--white));
   pointer-events: none;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.holding-home--container:not(.is-scroll-ready) .container {
+  visibility: hidden;
 }
 
 .home--logo {
@@ -687,7 +756,7 @@ body.has-home-scroll main.page-wrapper {
   margin: 0;
   margin-top: calc(var(--gutter) * 4);
   text-align: center;
-  white-space: pre-line;
+  white-space: nowrap;
   width: 100%;
 }
 
@@ -721,6 +790,8 @@ body.has-home-scroll main.page-wrapper {
   z-index: 2;
   pointer-events: auto;
   opacity: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .holding-home--container .media.is-landscape {
@@ -764,6 +835,8 @@ body.has-home-scroll main.page-wrapper {
   /* box-shadow: 1px 1px 30px rgba(0, 0, 0, 0.08); */
   transition: transform 0.6s ease;
   transform-origin: bottom;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 </style>

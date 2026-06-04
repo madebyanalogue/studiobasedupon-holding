@@ -282,7 +282,6 @@ header {
 
 
 
-.home-scroll-section,
 .home-updates-section {
   will-change: transform;
 }
@@ -382,6 +381,7 @@ header {
   position: absolute;
   bottom:0px;
   left: 0;
+  z-index: 1;
   transform: translateZ(0);
 }
 .progressive-blur.top {
@@ -564,7 +564,6 @@ header {
   }
 .update-item-media {
   position: relative;
-  cursor: pointer;
   overflow: hidden;
 }
 
@@ -573,6 +572,31 @@ header {
   width: 100%;
   height: auto;
 }
+
+.update-item-media--linked {
+  display: block;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.update-item-media--linked img {
+  transition: transform 0.5s ease;
+}
+
+@media (hover: hover) {
+  .update-item-media--linked:hover img {
+    transform: scale(1.05);
+  }
+}
+
+.update-item-text--linked {
+  display: block;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
 .update-item-media-container {
   position: relative;
 }
@@ -588,6 +612,15 @@ header {
   overflow: auto;
   pointer-events: none;
   font-size: var(--text-overlay);
+}
+.update-item-overlay > * {
+  width: 100%;
+}
+
+.update-item-overlay a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
 }
 
 @media all and (min-width: 1000px) {

@@ -20,7 +20,7 @@
             class="news-image rounded-medium"
           />
         </div>
-        <SanityBlocks v-if="item.content" :blocks="item.content" class="news-content fluid-type" style="--desktop: 60; --mobile: 16;" />
+        <SanityBlocks v-if="hasNewsCaption(item.content)" :blocks="item.content" class="news-content fluid-type" style="--desktop: 60; --mobile: 16;" />
       </article>
     </div>
   </section>
@@ -39,6 +39,16 @@ const newsItems = computed(() =>
     .map((item) => item?.newsPost)
     .filter(Boolean),
 )
+
+function hasNewsCaption(blocks) {
+  if (!Array.isArray(blocks)) return false
+
+  return blocks.some((block) => {
+    if (block?._type !== 'block') return true
+
+    return (block.children || []).some((child) => child?._type === 'span' && child.text?.trim())
+  })
+}
 </script>
 
 <style scoped>

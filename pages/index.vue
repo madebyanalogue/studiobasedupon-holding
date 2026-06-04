@@ -216,7 +216,8 @@ const HOLDING_QUERY = `{
     title,
     content,
     orderRank,
-    _createdAt,
+    date,
+    link,
     featuredImage {
       asset-> {
         _id,
@@ -274,16 +275,16 @@ function formatTimestamp(iso) {
   const parts = Object.fromEntries(
     new Intl.DateTimeFormat('en-GB', {
       timeZone: 'Europe/London',
-      hour: '2-digit',
-      minute: '2-digit',
+      // hour: '2-digit',
+      // minute: '2-digit',
       day: '2-digit',
       month: '2-digit',
       year: '2-digit',
-      hour12: false,
     }).formatToParts(date).map(({ type, value }) => [type, value]),
   )
 
-  return `${parts.hour}:${parts.minute} - ${parts.day} / ${parts.month} / ${parts.year}`
+  // return `${parts.hour}:${parts.minute} - ${parts.day} / ${parts.month} / ${parts.year}`
+  return `${parts.day} / ${parts.month} / ${parts.year}`
 }
 
 function compareOrderRank(a, b) {
@@ -299,12 +300,13 @@ const newsItems = computed(() =>
   [...(data.value?.news || [])]
     .sort(compareOrderRank)
     .map((item) => {
-      const excerpt = item.title || blocksToPlainText(item.content)
+      const caption = blocksToPlainText(item.content)
       return {
         ...item,
-        excerpt,
-        timestamp: item._createdAt || '',
-        timestampLabel: formatTimestamp(item._createdAt),
+        hasCaption: Boolean(caption),
+        excerpt: item.title || caption,
+        timestamp: item.date || '',
+        timestampLabel: formatTimestamp(item.date),
       }
     }),
 )
