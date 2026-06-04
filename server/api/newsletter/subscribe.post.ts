@@ -1,6 +1,7 @@
 const MAILCHIMP_USER_ID = '08cc39fe384e9191c5023a533'
 const MAILCHIMP_LIST_ID = '44500b04e4'
 const MAILCHIMP_FORM_ID = '00eba6e0f0'
+const MAILCHIMP_TAG_ID = '423217'
 const MAILCHIMP_DC = 'us7'
 const MAILCHIMP_HONEYPOT = `b_${MAILCHIMP_USER_ID}_${MAILCHIMP_LIST_ID}`
 
@@ -31,7 +32,7 @@ function parseMailchimpResponse(raw: unknown): MailchimpResponse {
 }
 
 export default defineEventHandler(async (event) => {
-  let body: { name?: string; email?: string }
+  let body: { firstName?: string; lastName?: string; email?: string; name?: string }
   try {
     body = (await readBody(event)) || {}
   } catch {
@@ -39,7 +40,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const email = body.email?.trim()
-  const name = body.name?.trim() || ''
+  const firstName = body.firstName?.trim() || ''
+  const lastName = body.lastName?.trim() || ''
 
   if (!email) {
     throw createError({
@@ -54,7 +56,9 @@ export default defineEventHandler(async (event) => {
     id: MAILCHIMP_LIST_ID,
     f_id: MAILCHIMP_FORM_ID,
     EMAIL: email,
-    FNAME: name,
+    FNAME: firstName,
+    LNAME: lastName,
+    tags: MAILCHIMP_TAG_ID,
     'gdpr[37]': 'Y',
     [MAILCHIMP_HONEYPOT]: '',
   })

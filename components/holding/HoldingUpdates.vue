@@ -42,13 +42,23 @@
           >
               <label data-holding-newsletter-field>
                 <input
-                  v-model="name"
+                  v-model="firstName"
                   type="text"
-                  name="name"
-                  placeholder="Name"
-                  autocomplete="name"
-                  aria-label="Name"
-                  required
+                  name="FNAME"
+                  placeholder="First name"
+                  autocomplete="given-name"
+                  aria-label="First name"
+                  :disabled="isSubmitting"
+                >
+              </label>
+              <label data-holding-newsletter-field>
+                <input
+                  v-model="lastName"
+                  type="text"
+                  name="LNAME"
+                  placeholder="Last name"
+                  autocomplete="family-name"
+                  aria-label="Last name"
                   :disabled="isSubmitting"
                 >
               </label>
@@ -56,7 +66,7 @@
                 <input
                   v-model="email"
                   type="email"
-                  name="email"
+                  name="EMAIL"
                   placeholder="Email"
                   autocomplete="email"
                   aria-label="Email"
@@ -72,7 +82,7 @@
                 {{ isSubmitting ? 'Submitting…' : 'Submit' }}
               </button>
           </form>
-          <div class=""></div>
+          <div class="" v-if="!submitted"></div>
           <div class="hr"></div>
         </div>
 
@@ -104,24 +114,12 @@
             class="update-item"
             :class="item.featuredImage?.asset?.url ? 'update-item--image' : 'update-item--text'"
           >
-            <component
-              :is="item.link ? 'a' : 'div'"
-              v-if="item.featuredImage?.asset?.url"
-              class="update-item-media"
-              :class="{
-                'is-active': item.hasCaption && !item.link && activeOverlayId === item._id,
-                'update-item-media--linked': item.link,
-              }"
-              :href="item.link || undefined"
-              :target="item.link ? '_blank' : undefined"
-              :rel="item.link ? 'noopener noreferrer' : undefined"
-              :tabindex="item.hasCaption && !item.link ? 0 : undefined"
-              :role="item.hasCaption && !item.link ? 'button' : undefined"
-              :aria-expanded="item.hasCaption && !item.link ? (activeOverlayId === item._id ? 'true' : 'false') : undefined"
-              :aria-label="item.hasCaption && !item.link ? (item.title || 'View update description') : undefined"
-              @click="item.hasCaption && !item.link && toggleImageOverlay(item._id)"
-              @keydown.enter.prevent="item.hasCaption && !item.link && toggleImageOverlay(item._id)"
-              @keydown.space.prevent="item.hasCaption && !item.link && toggleImageOverlay(item._id)"
+            <a
+              v-if="item.featuredImage?.asset?.url && item.postLink"
+              :href="item.postLink"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="update-item-media update-item-media--linked"
             >
               <div class="update-item-media-container">
                 <NuxtImg
@@ -137,16 +135,41 @@
                   <SanityBlocks :blocks="item.content" />
                 </div>
               </div>
-            </component>
-            <component
-              :is="item.link ? 'a' : 'div'"
-              v-else
+            </a>
+            <div
+              v-else-if="item.featuredImage?.asset?.url"
+              class="update-item-media"
+              :class="{ 'is-active': item.hasCaption && activeOverlayId === item._id }"
+              :tabindex="item.hasCaption ? 0 : undefined"
+              :role="item.hasCaption ? 'button' : undefined"
+              :aria-expanded="item.hasCaption ? (activeOverlayId === item._id ? 'true' : 'false') : undefined"
+              :aria-label="item.hasCaption ? (item.title || 'View update description') : undefined"
+              @click="item.hasCaption && toggleImageOverlay(item._id)"
+              @keydown.enter.prevent="item.hasCaption && toggleImageOverlay(item._id)"
+              @keydown.space.prevent="item.hasCaption && toggleImageOverlay(item._id)"
+            >
+              <div class="update-item-media-container">
+                <NuxtImg
+                  :src="item.featuredImage.asset.url"
+                  :alt="item.title || ''"
+                  data-holding-news-image
+                />
+                <div
+                  v-if="item.hasCaption"
+                  class="update-item-overlay"
+                  data-holding-news-overlay
+                >
+                  <SanityBlocks :blocks="item.content" />
+                </div>
+              </div>
+            </div>
+            <a
+              v-else-if="item.postLink"
+              :href="item.postLink"
+              target="_blank"
+              rel="noopener noreferrer"
               data-holding-news-text
-              class="update-item-text"
-              :class="{ 'update-item-text--linked': item.link }"
-              :href="item.link || undefined"
-              :target="item.link ? '_blank' : undefined"
-              :rel="item.link ? 'noopener noreferrer' : undefined"
+              class="update-item-text update-item-text--linked"
             >
               <div class="update-item-text-container">
                 <SanityBlocks
@@ -155,7 +178,20 @@
                   data-holding-news-content
                 />
               </div>
-            </component>
+            </a>
+            <div
+              v-else
+              data-holding-news-text
+              class="update-item-text"
+            >
+              <div class="update-item-text-container">
+                <SanityBlocks
+                  v-if="item.hasCaption"
+                  :blocks="item.content"
+                  data-holding-news-content
+                />
+              </div>
+            </div>
             <div class="update-item-timestamp-container">
               <time
                 v-if="item.timestamp"
@@ -225,7 +261,8 @@ const props = defineProps({
   },
 })
 
-const name = ref('')
+const firstName = ref('')
+const lastName = ref('')
 const email = ref('')
 const submitted = ref(false)
 const isSubmitting = ref(false)
@@ -396,7 +433,8 @@ async function submitNewsletter() {
     await $fetch('/api/newsletter/subscribe', {
       method: 'POST',
       body: {
-        name: name.value.trim(),
+        firstName: firstName.value.trim(),
+        lastName: lastName.value.trim(),
         email: email.value.trim(),
       },
     })
@@ -424,7 +462,7 @@ async function submitNewsletter() {
 
 .holding-newsletter-form {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 }
 

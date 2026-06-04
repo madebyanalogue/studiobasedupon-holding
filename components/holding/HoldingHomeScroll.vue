@@ -733,6 +733,7 @@ body.has-home-scroll main.page-wrapper {
   transform: translate(-50%, -50%);
   z-index: 3;
   pointer-events: none;
+  width: 100%;
 }
 
 .home--logo-inner {

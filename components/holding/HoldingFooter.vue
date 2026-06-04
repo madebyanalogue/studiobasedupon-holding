@@ -2,7 +2,7 @@
   <footer data-holding-footer class="footer">
     <div class="wrapper">
       <div class="footer-content">
-        <div data-holding-footer-title class="mono red-text">{{ siteTitle }}</div>
+        <div data-holding-footer-title class="mono show-desktop red-text">{{ siteTitle }}</div>
       
 
        
@@ -138,6 +138,11 @@ const { getContactLinkUrl, contactLinkUsesNative, isExternalHttp } = useContactL
     text-align: right;
     opacity: 1;
     pointer-events: auto;
+  }
+}
+@media all and (max-width: 999px) {
+  .show-desktop {
+    display: none;
   }
 }
 

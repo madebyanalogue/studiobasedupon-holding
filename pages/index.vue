@@ -301,8 +301,10 @@ const newsItems = computed(() =>
     .sort(compareOrderRank)
     .map((item) => {
       const caption = blocksToPlainText(item.content)
+      const postLink = typeof item.link === 'string' ? item.link.trim() : ''
       return {
         ...item,
+        postLink,
         hasCaption: Boolean(caption),
         excerpt: item.title || caption,
         timestamp: item.date || '',
